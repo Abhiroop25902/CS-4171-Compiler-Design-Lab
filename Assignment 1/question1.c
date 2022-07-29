@@ -259,7 +259,7 @@ int string_compare(void *aPtr, void *bPtr)
 // s is of type string*
 int string_hash(void *str)
 {
-    string s = *((string*)str);
+    string s = *((string *)str);
     int stringSize = strlen(s);
 
     const int p = 31, m = 1e9 + 7;
