@@ -1,1 +1,1 @@
-given a C program (in a .txt file), make a C program to get all unique words in the .txt file
+make a C program to get all unique words in the in it's own code and save it in some other file

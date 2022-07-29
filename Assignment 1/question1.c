@@ -292,7 +292,7 @@ int string_hash(void *str)
 }
 
 const int HASH_ARR_SIZE = 2;
-const int WORD_ARR_MAX_SIZE = 1000;
+const int WORD_ARR_MAX_SIZE = 100000;
 const int WORD_MAX_SIZE = 100;
 
 /**
@@ -405,7 +405,8 @@ string *setToWords(genericSet g)
     return wordArr;
 }
 
-const string FILE_PATH = "./hello_world.txt";
+// const string FILE_PATH = "./hello_world.c";
+const string FILE_PATH = "./question1.c";
 const string OUTPUT_FILE_PATH = "./unique_words.txt";
 
 void saveWordsToFile(string *words, const string outputFilePath)
@@ -428,19 +429,19 @@ void main()
 {
     string *words = getWordsFromFile(FILE_PATH);
 
-    for (int i = 0; i < WORD_ARR_MAX_SIZE && words[i] != NULL; i++)
-        printf("%s ", words[i]);
-    printf("\n");
+    // for (int i = 0; i < WORD_ARR_MAX_SIZE && words[i] != NULL; i++)
+    //     printf("%s ", words[i]);
+    // printf("\n");
 
     genericSet uniqueWordSet = addWordsInSet(words);
     string *uniqueWords = setToWords(uniqueWordSet);
 
     saveWordsToFile(uniqueWords, OUTPUT_FILE_PATH);
 
-    for (int i = 0; i < WORD_ARR_MAX_SIZE && uniqueWords[i] != NULL; i++)
-        printf("%s ", uniqueWords[i]);
-    printf("\n");
+    // for (int i = 0; i < WORD_ARR_MAX_SIZE && uniqueWords[i] != NULL; i++)
+    //     printf("%s ", uniqueWords[i]);
+    // printf("\n");
 
-    printf("Number of Words in the file: %d\n", wordArrLength(words));
-    printf("Number of Unique Words in the file: %d\n", wordArrLength(uniqueWords));
+    printf("Number of Words in the '%s': %d\n", FILE_PATH, wordArrLength(words));
+    printf("Number of Unique Words in the '%s': %d\n", FILE_PATH, wordArrLength(uniqueWords));
 }
