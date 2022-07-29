@@ -229,6 +229,24 @@ void printGSet(genericSet set)
         printGLL(set->hashArray[i]);
 }
 
+int gSetSize(genericSet g)
+{
+    int count = 0;
+
+    for (int i = 0; i < g->hashArraySize; i++)
+    {
+        node *temp = g->hashArray[i]->list;
+
+        while (temp != NULL)
+        {
+            count++;
+            temp = temp->next;
+        }
+    }
+
+    return count;
+}
+
 // ------------------------- Set Code End ---------------------------
 
 // type of aPtr is string*
@@ -273,45 +291,137 @@ int string_hash(void *str)
     return hash;
 }
 
+const int HASH_ARR_SIZE = 2;
+const int WORD_ARR_MAX_SIZE = 1000;
+const int WORD_MAX_SIZE = 100;
+
+/**
+ * @brief Get the Words From File object
+ * 
+ * @param filePath the path of the file
+ * @return string* array of words from the filePath
+ */
+string *getWordsFromFile(const string filePath)
+{
+    string *wordArr = malloc(sizeof(string) * WORD_ARR_MAX_SIZE);
+
+    for (int i = 0; i < WORD_ARR_MAX_SIZE; i++)
+        wordArr[i] = NULL;
+
+    int wordArrIdx = 0;
+    char *word = (char *)malloc(sizeof(char) * WORD_MAX_SIZE);
+
+    FILE *in_file = fopen(filePath, "r");
+
+    if (in_file == NULL)
+    {
+        printf("Can't open %s for reading.\n", filePath);
+        perror("File Open Error");
+        exit(-1);
+    }
+
+    while (fscanf(in_file, "%s", word) != EOF)
+    {
+        if (wordArrIdx == WORD_ARR_MAX_SIZE)
+        {
+            printf("Programme Stopped, increase WORD_ARR_MAX_SIZE");
+            exit(-1);
+        }
+        wordArr[wordArrIdx] = (char *)malloc(strlen(word) * sizeof(char));
+        strcpy(wordArr[wordArrIdx], word);
+        wordArrIdx++;
+    }
+    fclose(in_file);
+    free(word);
+
+    return wordArr;
+}
+
+/**
+ * @brief 
+ * 
+ * @param wordArr 
+ * @return int length of the wordArr
+ */
+int wordArrLength(const string *wordArr)
+{
+    int size = 0;
+
+    for (int i = 0; i < WORD_ARR_MAX_SIZE && wordArr[i] != NULL; i++)
+        size++;
+
+    return size;
+}
+
+/**
+ * @brief add all the words in the genericSet and returns the resultant Set
+ * 
+ * @param words 
+ * @return genericSet 
+ */
+genericSet addWordsInSet(string *words)
+{
+    int idx = 0;
+    genericSet set = createSet(sizeof(string), HASH_ARR_SIZE, string_hash, string_compare, string_print);
+
+    while (idx < WORD_ARR_MAX_SIZE && words[idx] != NULL)
+    {
+        insertGSet(set, &words[idx]);
+        idx++;
+    }
+
+    return set;
+}
+
+/**
+ * @brief geives a list of words in the set
+ * 
+ * @param g 
+ * @return string* array of words in set
+ */
+string *setToWords(genericSet g)
+{
+    string *wordArr = malloc(sizeof(string) * WORD_ARR_MAX_SIZE);
+
+    for (int i = 0; i < WORD_ARR_MAX_SIZE; i++)
+        wordArr[i] = NULL;
+
+    int wordArrIdx = 0;
+
+    for (int i = 0; i < g->hashArraySize; i++)
+    {
+        node *temp = g->hashArray[i]->list;
+
+        while (temp != NULL)
+        {
+            string s = *((string *)temp->data);
+            wordArr[wordArrIdx] = (char *)malloc(strlen(s) * sizeof(char));
+            strcpy(wordArr[wordArrIdx], s);
+            wordArrIdx++;
+            temp = temp->next;
+        }
+    }
+
+    return wordArr;
+}
+
+const string FILE_PATH = "./hello_world.txt";
+
 void main()
 {
-    // genericLL g = createGLL(sizeof(string), string_compare, string_print); // makes stack
+    string *words = getWordsFromFile(FILE_PATH);
 
-    // char *a = "1";
-    // addNodeGLL(g, &a);
-    // printGLL(g);
+    for (int i = 0; i < WORD_ARR_MAX_SIZE && words[i] != NULL; i++)
+        printf("%s ", words[i]);
+    printf("\n");
 
-    // char *b = "3";
-    // addNodeGLL(g, &b);
-    // printGLL(g);
+    genericSet uniqueWordSet = addWordsInSet(words);
+    string* uniqueWords = setToWords(uniqueWordSet);
 
-    // char *c = "2";
-    // addNodeGLLSorted(g, &c);
-    // printGLL(g);
+    for (int i = 0; i < WORD_ARR_MAX_SIZE && uniqueWords[i] != NULL; i++)
+        printf("%s ", uniqueWords[i]);
+    printf("\n");
 
-    // char *d = "4";
-    // addNodeGLL(g, &d);
-    // printGLL(g);
-
-    // printf("isPresentNode for 2: %d\n", isPresentGLL(g, &c));
-
-    // printf("deleteNodeGLL() for 3 : %d\n", deleteNodeGLL(g, &b));
-    // printGLL(g);
-
-    // string *ptr = (string *)malloc(sizeof(string));
-    // getNodeDataGLL(g, 3, (void *)ptr);
-    // printf("getNodeDataGLL for 3: %s\n", *ptr);
-
-    genericSet set = createSet(sizeof(string), 5, string_hash, string_compare, string_print);
-    char *a = "1";
-    insertGSet(set, &a);
-    insertGSet(set, &a);
-    a = "2";
-    insertGSet(set, &a);
-    a = "3";
-    insertGSet(set, &a);
-    a = "4";
-    insertGSet(set, &a);
-
-    printGSet(set);
+    printf("Number of Words in the file: %d\n", wordArrLength(words));
+    printf("Number of Unique Words in the file: %d\n", wordArrLength(uniqueWords));
 }
