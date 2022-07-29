@@ -154,17 +154,6 @@ int getNodeDataGLL(genericLL g, int i, void *d) // give output of ith node
     return 1;
 }
 
-int int_compare(void *a, void *b) // compare function for int
-{
-
-    if (*(int *)a == *(int *)b)
-        return 0;
-    else if (*(int *)a < *(int *)b)
-        return -1;
-    else
-        return 1;
-}
-
 // here a and b are of type string*
 int string_compare(void *aPtr, void *bPtr)
 {
