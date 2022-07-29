@@ -297,7 +297,7 @@ const int WORD_MAX_SIZE = 100;
 
 /**
  * @brief Get the Words From File object
- * 
+ *
  * @param filePath the path of the file
  * @return string* array of words from the filePath
  */
@@ -338,9 +338,9 @@ string *getWordsFromFile(const string filePath)
 }
 
 /**
- * @brief 
- * 
- * @param wordArr 
+ * @brief
+ *
+ * @param wordArr
  * @return int length of the wordArr
  */
 int wordArrLength(const string *wordArr)
@@ -355,9 +355,9 @@ int wordArrLength(const string *wordArr)
 
 /**
  * @brief add all the words in the genericSet and returns the resultant Set
- * 
- * @param words 
- * @return genericSet 
+ *
+ * @param words
+ * @return genericSet
  */
 genericSet addWordsInSet(string *words)
 {
@@ -375,8 +375,8 @@ genericSet addWordsInSet(string *words)
 
 /**
  * @brief geives a list of words in the set
- * 
- * @param g 
+ *
+ * @param g
  * @return string* array of words in set
  */
 string *setToWords(genericSet g)
@@ -406,6 +406,23 @@ string *setToWords(genericSet g)
 }
 
 const string FILE_PATH = "./hello_world.txt";
+const string OUTPUT_FILE_PATH = "./unique_words.txt";
+
+void saveWordsToFile(string *words, const string outputFilePath)
+{
+    FILE *fout = fopen(outputFilePath, "w");
+
+    if (fout == NULL)
+    {
+        perror("fopen() error");
+        exit(-1);
+    }
+
+    for (int i = 0; i < WORD_ARR_MAX_SIZE && words[i] != NULL; i++)
+        fprintf(fout, "%s\n", words[i]);
+
+    fclose(fout);
+}
 
 void main()
 {
@@ -416,7 +433,9 @@ void main()
     printf("\n");
 
     genericSet uniqueWordSet = addWordsInSet(words);
-    string* uniqueWords = setToWords(uniqueWordSet);
+    string *uniqueWords = setToWords(uniqueWordSet);
+
+    saveWordsToFile(uniqueWords, OUTPUT_FILE_PATH);
 
     for (int i = 0; i < WORD_ARR_MAX_SIZE && uniqueWords[i] != NULL; i++)
         printf("%s ", uniqueWords[i]);
