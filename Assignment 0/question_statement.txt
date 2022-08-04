@@ -1,0 +1,1 @@
+make a C program to get all unique words in the in it's own code and save it in some other file
