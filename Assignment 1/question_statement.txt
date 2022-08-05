@@ -1,1 +1,7 @@
-make a C program to get all unique words in the in it's own code and save it in some other file
+Implement a lexical analyzer using C program for the following types of tokens:
+a) Arithmetic, Relational, Logical, Bitwise and Assignment Operators of C.
+b) Reserved words:int, float,char, for, while, if, else etc.
+c) Identifier.
+d) Integer Constants.
+e) Parentheses, Curly braces
+Follow the ideas of yytext, yyleng, etc. as stated in the class.
