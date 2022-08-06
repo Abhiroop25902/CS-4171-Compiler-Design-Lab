@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "uthash.h" // for hashmap
+// source: https://troydhanson.github.io/uthash/userguide.html
 
 /* Single caharacter lexemes */
 #define LPAREN_TOK '('
@@ -46,9 +48,9 @@
 /*....................
 .......................*/
 /* Identifier, constants..*/
-#define ID_TOK 350
-#define INTCONST 351
-#define HEADER 352
+#define INTCONST 350
+#define HEADER 351
+int nextIdTok = 352; // will be the idtok for next variables
 /*....................
 .......................*/
 
@@ -66,6 +68,15 @@ int yyleng;
 
 // TODO: found out what yylval means
 // yylval -> value associated with token
+
+// token_struct for the map
+struct map_struct
+{
+    const char *name; /* key */
+    int tok;
+    UT_hash_handle hh; /* makes this structure hashable */
+};
+struct map_struct *tokens = NULL; // The array of the map
 
 void fixMultipleToken()
 {
@@ -232,8 +243,26 @@ int yylex()
 
     printf("%s\t", yytext);
 
-    if (res == -1)
-        return ID_TOK;
+    if (res == -1) // i.e the token is a variable name
+    {
+        // idea: we have a map which has key as string, and value as token number
+        //  we first check if key is already present or not
+        //  if present we return it's token
+        //  else we make a new entry in map with the string as key and new token as value
+        struct map_struct *s;
+        HASH_FIND_STR(tokens, yytext, s);
+
+        if (s) // i.e data is found
+            return s->tok;
+
+        // else data is not present hence we add it and return token
+        s = (struct map_struct *)malloc(sizeof *s);
+        s->name = yytext;
+        s->tok = nextIdTok;
+        nextIdTok++;
+        HASH_ADD_KEYPTR(hh, tokens, s->name, strlen(s->name), s);
+        return s->tok;
+    }
 
     return res;
 }
@@ -243,6 +272,13 @@ int yywrap(void)
 {
     fclose(yyin);
     free(yytext);
+
+    struct map_struct *s, *tmp;
+
+    HASH_ITER(hh, tokens, s, tmp){
+        HASH_DEL(tokens, s);
+        free(s);
+    }
 }
 
 void main(int argc, char *argv[])
@@ -255,6 +291,9 @@ void main(int argc, char *argv[])
     }
 
     yyin = fopen(argv[1], "r");
+    if(yyin == NULL)
+        perror("fopen() error");
+
     yytext = (char *)malloc(sizeof(char) * YYTEXT_MAX_SIZE);
     while (!feof(yyin))
     {
