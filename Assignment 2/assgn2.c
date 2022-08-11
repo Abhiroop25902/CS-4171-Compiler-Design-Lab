@@ -58,6 +58,7 @@
 #define AND_AND_TOK 278
 #define OR_OR_TOK 279
 #define XOR_EQUAL_TOK 280
+#define IF_TOK 281
 
 /*....................
 .......................*/
@@ -105,7 +106,7 @@ void handle_comment()
 
 int other()
 {
-    printf("goback");
+    printf("goback\n");
     fseek(yyin, -1, SEEK_CUR);
     int prevState = stateNo;
     stateNo = 0;
@@ -132,7 +133,7 @@ int other()
         return AND_TOK;
     if (prevState == 26)
         return OR_TOK;
-    if(prevState == 28)
+    if (prevState == 28)
         return XOR_TOK;
 
     return -1;
@@ -144,8 +145,6 @@ int yylex()
 
     if (yytext[0] == '\n')
         yylineNo++;
-
-    printf("%s\t", yytext);
 
     if (stateNo == 0) // start
     {
@@ -173,6 +172,18 @@ int yylex()
             stateNo = 26;
         else if (yytext[0] == '^')
             stateNo = 28;
+        else if (yytext[0] == 'i')
+            stateNo = 30;
+        else if (yytext[0] == 'f')
+            stateNo = 39;
+        else if (yytext[0] == 'c')
+            stateNo = 44;
+        else if (yytext[0] == 'w')
+            stateNo = 50;
+        else if (yytext[0] == 'e')
+            stateNo = 55;
+        else if (yytext[0] == 'l')
+            stateNo = 59;
         else // TODO: error
             return -1;
     }
@@ -318,6 +329,207 @@ int yylex()
         else
             return other();
     }
+    else if (stateNo == 30) // i
+    {
+        if (yytext[0] == 'n')
+            stateNo = 31;
+        else if (yytext[0] == 'f')
+        {
+            stateNo = 0;
+            return IF_TOK;
+        }
+        else
+            return other();
+    }
+    else if (stateNo == 31) // in
+    {
+        if (yytext[0] == 'c')
+            stateNo = 33;
+        else if (yytext[0] == 't')
+        {
+            stateNo = 0;
+            return INT_TOK;
+        }
+        else
+            return other();
+    }
+    else if (stateNo == 33) // inc
+    {
+        if (yytext[0] == 'l')
+            stateNo = 34;
+        else
+            return other();
+    }
+    else if (stateNo == 34) // incl
+    {
+        if (yytext[0] == 'u')
+            stateNo = 35;
+        else
+            return other();
+    }
+    else if (stateNo == 35) // inclu
+    {
+        if (yytext[0] == 'd')
+            stateNo = 36;
+        else
+            return other();
+    }
+    else if (stateNo == 36) // includ
+    {
+        if (yytext[0] == 'e')
+        {
+            stateNo = 0;
+            return INCLUDE_TOK;
+        }
+        else
+            return other();
+    }
+    else if (stateNo == 39) // f
+    {
+        if (yytext[0] == 'l')
+            stateNo = 40;
+        else if (yytext[0] == 'o')
+            stateNo = 48;
+        else
+            return other();
+    }
+    else if (stateNo == 40) // fl
+    {
+        if (yytext[0] == 'o')
+            stateNo = 41;
+        else
+            return other();
+    }
+    else if (stateNo == 41) // flo
+    {
+        if (yytext[0] == 'a')
+            stateNo = 42;
+        else
+            return other();
+    }
+    else if (stateNo == 42) // floa
+    {
+        if (yytext[0] == 't')
+        {
+            stateNo = 0;
+            return FLOAT_TOK;
+        }
+        else
+            return other();
+    }
+    else if (stateNo == 48) // fo
+    {
+        if (yytext[0] == 'r')
+        {
+            stateNo = 0;
+            return FOR_TOK;
+        }
+        else
+            return other();
+    }
+    else if (stateNo == 44) // c
+    {
+        if (yytext[0] == 'h')
+            stateNo = 45;
+        else
+            return other();
+    }
+    else if (stateNo == 45) // ch
+    {
+        if (yytext[0] == 'a')
+            stateNo = 46;
+        else
+            return other();
+    }
+    else if (stateNo == 46) // cha
+    {
+        if (yytext[0] == 'r')
+        {
+            stateNo = 0;
+            return CHAR_TOK;
+        }
+        else
+            return other();
+    }
+    else if (stateNo == 50) // w
+    {
+        if (yytext[0] == 'h')
+            stateNo = 51;
+        else
+            return other();
+    }
+    else if (stateNo == 51) // wh
+    {
+        if (yytext[0] == 'i')
+            stateNo = 52;
+        else
+            return other();
+    }
+    else if (stateNo == 52) // whi
+    {
+        if (yytext[0] == 'l')
+            stateNo = 53;
+        else
+            return other();
+    }
+    else if (stateNo == 53) // whil
+    {
+        if (yytext[0] == 'e')
+        {
+            stateNo = 0;
+            return WHILE_TOK;
+        }
+        else
+            return other();
+    }
+    else if (stateNo == 55) // e
+    {
+        if (yytext[0] == 'l')
+            stateNo = 56;
+        else
+            return other();
+    }
+    else if (stateNo == 56) // el
+    {
+        if (yytext[0] == 's')
+            stateNo = 57;
+        else
+            return other();
+    }
+    else if (stateNo == 57) // els
+    {
+        if (yytext[0] == 'e')
+        {
+            stateNo = 0;
+            return ELSE_TOK;
+        }
+        else
+            return other();
+    }
+    else if (stateNo == 59) // l
+    {
+        if (yytext[0] == 'o')
+            stateNo = 60;
+        else
+            return other();
+    }
+    else if (stateNo == 60) // lo
+    {
+        if (yytext[0] == 'n')
+            stateNo = 61;
+        else
+            return other();
+    }
+    else if (stateNo == 61) // lon
+    {
+        if (yytext[0] == 'g')
+        {
+            stateNo = 0;
+            return LONG_TOK;
+        }
+        else
+            return other();
+    }
     else // TODO: error
         stateNo = 0;
 
@@ -342,7 +554,7 @@ void main(int argc, char *argv[])
     while (!feof(yyin))
     {
         token = yylex();
-        printf("%d\n", token);
+        printf("%s\t%d\n", yytext, token);
     }
     yywrap();
 }
