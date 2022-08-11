@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 /* Single caharacter lexemes */
 #define LPAREN_TOK '('
@@ -65,7 +66,7 @@
 /* Identifier, constants..*/
 #define INTCONST 350
 #define HEADER 351
-int nextIdTok = 352; // will be the idtok for next variables
+#define ID_TOK 352
 /*....................
 .......................*/
 
@@ -107,7 +108,17 @@ void handle_comment()
 int other()
 {
     printf("goback\n");
-    fseek(yyin, -1, SEEK_CUR);
+    // we want to go back on place in file so that the
+    // FSM can process it from state zero
+
+    // the next character is already in yytext and we also
+    // need to get prev char from file
+
+    // so we go back two places
+    fseek(yyin, -2, SEEK_CUR);
+    // then read one character again (no we are back one place)
+    fscanf(yyin, "%c", yytext);
+
     int prevState = stateNo;
     stateNo = 0;
 
@@ -135,7 +146,8 @@ int other()
         return OR_TOK;
     if (prevState == 28)
         return XOR_TOK;
-
+    if (prevState >= 30 && prevState <= 63) // characters
+        return ID_TOK;
     return -1;
 }
 
@@ -184,6 +196,8 @@ int yylex()
             stateNo = 55;
         else if (yytext[0] == 'l')
             stateNo = 59;
+        else if (isalpha(yytext[0]))
+            stateNo = 63;
         else // TODO: error
             return -1;
     }
@@ -338,6 +352,8 @@ int yylex()
             stateNo = 0;
             return IF_TOK;
         }
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -350,6 +366,8 @@ int yylex()
             stateNo = 0;
             return INT_TOK;
         }
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -357,6 +375,8 @@ int yylex()
     {
         if (yytext[0] == 'l')
             stateNo = 34;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -364,6 +384,8 @@ int yylex()
     {
         if (yytext[0] == 'u')
             stateNo = 35;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -371,6 +393,8 @@ int yylex()
     {
         if (yytext[0] == 'd')
             stateNo = 36;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -381,6 +405,8 @@ int yylex()
             stateNo = 0;
             return INCLUDE_TOK;
         }
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -390,6 +416,8 @@ int yylex()
             stateNo = 40;
         else if (yytext[0] == 'o')
             stateNo = 48;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -397,6 +425,8 @@ int yylex()
     {
         if (yytext[0] == 'o')
             stateNo = 41;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -404,6 +434,8 @@ int yylex()
     {
         if (yytext[0] == 'a')
             stateNo = 42;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -414,6 +446,8 @@ int yylex()
             stateNo = 0;
             return FLOAT_TOK;
         }
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -424,6 +458,8 @@ int yylex()
             stateNo = 0;
             return FOR_TOK;
         }
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -431,6 +467,8 @@ int yylex()
     {
         if (yytext[0] == 'h')
             stateNo = 45;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -438,6 +476,8 @@ int yylex()
     {
         if (yytext[0] == 'a')
             stateNo = 46;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -448,6 +488,8 @@ int yylex()
             stateNo = 0;
             return CHAR_TOK;
         }
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -455,6 +497,8 @@ int yylex()
     {
         if (yytext[0] == 'h')
             stateNo = 51;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -462,6 +506,8 @@ int yylex()
     {
         if (yytext[0] == 'i')
             stateNo = 52;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -469,6 +515,8 @@ int yylex()
     {
         if (yytext[0] == 'l')
             stateNo = 53;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -479,6 +527,8 @@ int yylex()
             stateNo = 0;
             return WHILE_TOK;
         }
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -486,6 +536,8 @@ int yylex()
     {
         if (yytext[0] == 'l')
             stateNo = 56;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -493,6 +545,8 @@ int yylex()
     {
         if (yytext[0] == 's')
             stateNo = 57;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -503,6 +557,8 @@ int yylex()
             stateNo = 0;
             return ELSE_TOK;
         }
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -510,6 +566,8 @@ int yylex()
     {
         if (yytext[0] == 'o')
             stateNo = 60;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -517,6 +575,8 @@ int yylex()
     {
         if (yytext[0] == 'n')
             stateNo = 61;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
@@ -527,6 +587,15 @@ int yylex()
             stateNo = 0;
             return LONG_TOK;
         }
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 63)
+    {
+        if (isalnum(yytext[0]))
+            stateNo = 63;
         else
             return other();
     }
