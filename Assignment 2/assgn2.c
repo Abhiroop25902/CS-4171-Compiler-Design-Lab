@@ -91,7 +91,7 @@ int yylineNo;
 
 int stateNo = 0;
 
-// TODO: found out what yylval means
+// yyval is the value if we returning INTCONST
 // yylval -> value associated with token
 
 // wrapup, return 1 if done, 0 if not done
@@ -108,6 +108,7 @@ void handle_comment()
     do
         fscanf(yyin, "%c", yytext);
     while (yytext[0] != '\n');
+    yylineNo++;
 }
 
 int other()
@@ -160,7 +161,8 @@ int other()
     if (prevState == 69) // exponential notation
         return EXPCONST;
 
-    return -1; // TODO: throw error
+    printf("Error on Line %d\n", yylineNo);
+    exit(1);
 }
 
 int yylex()
@@ -241,8 +243,11 @@ int yylex()
             return COMMA_TOK;
         else if (yytext[0] == '~')
             return COMPLEMENT_TOK;
-        else // TODO: error
-            return -1;
+        else
+        {
+            printf("Error on Line %d\n", yylineNo);
+            exit(1);
+        }
     }
     else if (stateNo == 1) // +
     {
@@ -696,16 +701,18 @@ int yylex()
         else
             return other();
     }
-
-    else // TODO: error
-        stateNo = 0;
+    else
+    {
+        printf("Error on Line %d\n", yylineNo);
+        exit(1);
+    }
 
     return -1;
 }
 
 void main(int argc, char *argv[])
 {
-    yylineNo = 0;
+    yylineNo = 1;
     int token;
     if (argc != 2)
     {
