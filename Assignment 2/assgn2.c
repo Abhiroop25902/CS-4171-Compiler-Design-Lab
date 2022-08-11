@@ -31,6 +31,8 @@
 #define OR_TOK '|'
 #define XOR_TOK '^'
 #define COMPLEMENT_TOK '~'
+#define DEREFERENCE_TOK '.'
+#define BACKSLASH_TOK '\\'
 /*....................
 .......................*/
 /* Reserved words */
@@ -101,6 +103,7 @@ int yywrap(void)
 
 void handle_comment()
 {
+    printf("comment");
     stateNo = 0;
     do
         fscanf(yyin, "%c", yytext);
@@ -156,15 +159,19 @@ int other()
         return FLOATCONST;
     if (prevState == 69) // exponential notation
         return EXPCONST;
+
     return -1; // TODO: throw error
 }
 
 int yylex()
 {
-    fscanf(yyin, "%c", yytext);
+    do
+    {
+        fscanf(yyin, "%c", yytext);
 
-    if (yytext[0] == '\n')
-        yylineNo++;
+        if (yytext[0] == '\n')
+            yylineNo++;
+    } while (yytext[0] == ' ' || yytext[0] == '\t' || yytext[0] == '\n');
 
     if (stateNo == 0) // start
     {
@@ -208,6 +215,32 @@ int yylex()
             stateNo = 63;
         else if (isdigit(yytext[0]))
             stateNo = 64;
+        else if (yytext[0] == '#')
+            return HASH_TOK;
+        else if (yytext[0] == '{')
+            return CURLY_BRACKET_START_TOK;
+        else if (yytext[0] == '}')
+            return CURLY_BRACKET_END_TOK;
+        else if (yytext[0] == '(')
+            return LPAREN_TOK;
+        else if (yytext[0] == ')')
+            return RPAREN_TOK;
+        else if (yytext[0] == '[')
+            return SQUARE_BRACKET_START_TOK;
+        else if (yytext[0] == ']')
+            return SQUARE_BRACKET_END_TOK;
+        else if (yytext[0] == '.')
+            return DEREFERENCE_TOK;
+        else if (yytext[0] == ';')
+            return SEMICOLON_TOK;
+        else if (yytext[0] == '"')
+            return DOUBLE_QUOTE_TOK;
+        else if (yytext[0] == '\\')
+            return BACKSLASH_TOK;
+        else if (yytext[0] == ',')
+            return COMMA_TOK;
+        else if (yytext[0] == '~')
+            return COMPLEMENT_TOK;
         else // TODO: error
             return -1;
     }

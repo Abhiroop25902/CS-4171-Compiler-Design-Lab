@@ -28,6 +28,7 @@ void main() // This comment
     d ^= 100;
 
     float x = -10.23e10;
+    int asdfd[10];
 
     while (d >= 0 && d--)
         printf("%lld\t", d);
