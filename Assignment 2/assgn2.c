@@ -67,6 +67,8 @@
 #define INTCONST 350
 #define HEADER 351
 #define ID_TOK 352
+#define FLOATCONST 351
+#define EXPCONST 352
 /*....................
 .......................*/
 
@@ -148,7 +150,13 @@ int other()
         return XOR_TOK;
     if (prevState >= 30 && prevState <= 63) // characters
         return ID_TOK;
-    return -1;
+    if (prevState == 64) // integer
+        return INTCONST;
+    if (prevState == 66) // float
+        return FLOATCONST;
+    if (prevState == 69) // exponential notation
+        return EXPCONST;
+    return -1; // TODO: throw error
 }
 
 int yylex()
@@ -198,6 +206,8 @@ int yylex()
             stateNo = 59;
         else if (isalpha(yytext[0]))
             stateNo = 63;
+        else if (isdigit(yytext[0]))
+            stateNo = 64;
         else // TODO: error
             return -1;
     }
@@ -213,6 +223,8 @@ int yylex()
             stateNo = 0;
             return PLUS_PLUS_TOK;
         }
+        else if (isdigit(yytext[0]))
+            stateNo = 64;
         else
             return other();
     }
@@ -228,6 +240,8 @@ int yylex()
             stateNo = 0;
             return MINUS_EQUAL_TOK;
         }
+        else if (isdigit(yytext[0]))
+            stateNo = 64;
         else
             return other();
     }
@@ -592,13 +606,64 @@ int yylex()
         else
             return other();
     }
-    else if (stateNo == 63)
+    else if (stateNo == 63) // one or more characters
     {
         if (isalnum(yytext[0]))
             stateNo = 63;
         else
             return other();
     }
+    else if (stateNo == 64) // (+ or - or empty)x; where x is a digit
+    {
+        if (isdigit(yytext[0]))
+            stateNo = 64;
+        else if (yytext[0] == '.')
+            stateNo = 65;
+        else if (yytext[0] == 'e')
+            stateNo = 67;
+        else
+            return other();
+    }
+    else if (stateNo == 65) // (+ or - or empty)(multiple digits).
+    {
+        if (isdigit(yytext[0]))
+            stateNo = 66;
+        else
+            return other();
+    }
+    else if (stateNo == 66) // (+ or - or empty)(digits).digit
+    {
+        if (isdigit(yytext[0]))
+            stateNo = 66;
+        else if (yytext[0] == 'e')
+            stateNo = 67;
+        else
+            return other();
+    }
+    else if (stateNo == 67) // (+ or - or empty)(digits).(digits)e OR (+ or - or empty)(digits)e
+    {
+        if (isdigit(yytext[0]))
+            stateNo = 69;
+        else if (yytext[0] == '+' || yytext[0] == '-')
+            stateNo = 68;
+        else
+            return other();
+    }
+    else if (stateNo == 68) // (+ or - or empty)(digits).(digits)e(- or +) OR (+ or - or empty)(digits)e(- or +)
+    {
+        if (isdigit(yytext[0]))
+            stateNo = 69;
+        else
+            return other();
+    }
+    else if (stateNo == 69) // (+ or - or empty)(digits).(digits)e(- or + or empty) OR (+ or - or empty)(digits)e(- or + or empty)
+    {
+        if (isdigit(yytext[0]))
+            stateNo = 69;
+        else
+            return other();
+    }
+
     else // TODO: error
         stateNo = 0;
 

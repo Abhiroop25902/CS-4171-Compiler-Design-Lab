@@ -7,7 +7,7 @@ void main() // This comment
     for (char i = 0; i <= 10; i++)
         printf("%d\t", i);
 
-    float f = (10 / 3 * 2) % 5;
+    float f = (10 / 3 * 2) % 5 + (+0.05) - (-1e-2);
     f = f + 2;
     f -= 2;
     f /= 1;
@@ -26,6 +26,8 @@ void main() // This comment
     d = d << 1;
     d += 10;
     d ^= 100;
+
+    float x = -10.23e10;
 
     while (d >= 0 && d--)
         printf("%lld\t", d);
