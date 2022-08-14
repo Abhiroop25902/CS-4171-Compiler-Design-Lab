@@ -173,7 +173,7 @@ int yylex()
 
         if (yytext[0] == '\n')
             yylineNo++;
-    } while (yytext[0] == ' ' || yytext[0] == '\t' || yytext[0] == '\n');
+    } while (yytext[0] == '\t' || yytext[0] == '\n');
 
     if (stateNo == 0) // start
     {
@@ -243,6 +243,8 @@ int yylex()
             return COMMA_TOK;
         else if (yytext[0] == '~')
             return COMPLEMENT_TOK;
+        else if (yytext[0] == ' ')
+            ; // ignore
         else
         {
             printf("Error on Line %d\n", yylineNo);
@@ -400,6 +402,15 @@ int yylex()
         if (yytext[0] == 'n')
             stateNo = 31;
         else if (yytext[0] == 'f')
+            stateNo = 38;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 38) // if
+    {
+        if (yytext[0] == ' ')
         {
             stateNo = 0;
             return IF_TOK;
@@ -414,6 +425,15 @@ int yylex()
         if (yytext[0] == 'c')
             stateNo = 33;
         else if (yytext[0] == 't')
+            stateNo = 32;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 32) // int
+    {
+        if (yytext[0] == ' ')
         {
             stateNo = 0;
             return INT_TOK;
@@ -453,6 +473,15 @@ int yylex()
     else if (stateNo == 36) // includ
     {
         if (yytext[0] == 'e')
+            stateNo = 37;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 37) // include
+    {
+        if (yytext[0] == ' ')
         {
             stateNo = 0;
             return INCLUDE_TOK;
@@ -494,6 +523,15 @@ int yylex()
     else if (stateNo == 42) // floa
     {
         if (yytext[0] == 't')
+            stateNo = 43;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 43) // float
+    {
+        if (yytext[0] == ' ')
         {
             stateNo = 0;
             return FLOAT_TOK;
@@ -506,6 +544,15 @@ int yylex()
     else if (stateNo == 48) // fo
     {
         if (yytext[0] == 'r')
+            stateNo = 49;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 49) // for
+    {
+        if (yytext[0] == ' ')
         {
             stateNo = 0;
             return FOR_TOK;
@@ -536,6 +583,15 @@ int yylex()
     else if (stateNo == 46) // cha
     {
         if (yytext[0] == 'r')
+            stateNo = 47;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 47) // char
+    {
+        if (yytext[0] == ' ')
         {
             stateNo = 0;
             return CHAR_TOK;
@@ -575,6 +631,15 @@ int yylex()
     else if (stateNo == 53) // whil
     {
         if (yytext[0] == 'e')
+            stateNo = 54;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 54) // while
+    {
+        if (yytext[0] == ' ')
         {
             stateNo = 0;
             return WHILE_TOK;
@@ -605,6 +670,15 @@ int yylex()
     else if (stateNo == 57) // els
     {
         if (yytext[0] == 'e')
+            stateNo = 58;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 58) // else
+    {
+        if (yytext[0] == ' ')
         {
             stateNo = 0;
             return ELSE_TOK;
@@ -635,6 +709,15 @@ int yylex()
     else if (stateNo == 61) // lon
     {
         if (yytext[0] == 'g')
+            stateNo = 62;
+        else if (isalnum(yytext[0]))
+            stateNo = 63;
+        else
+            return other();
+    }
+    else if (stateNo == 62) // long
+    {
+        if (yytext[0] == ' ')
         {
             stateNo = 0;
             return LONG_TOK;
