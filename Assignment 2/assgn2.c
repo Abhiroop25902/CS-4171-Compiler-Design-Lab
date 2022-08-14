@@ -1,3 +1,8 @@
+/*
+Compiler Design Assignment 2
+Name: Abhiroop Mukherjee
+Enrol No.: 510519109
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
