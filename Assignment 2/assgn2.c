@@ -88,6 +88,7 @@ FILE *yyout;
 // Variable yytext is a pointer to the matched string (NULL-terminated)
 char *yytext;
 const int YYTEXT_MAX_SIZE = 100;
+int yytextIdx;
 
 // length of matched string
 int yyleng;
@@ -109,16 +110,15 @@ int yywrap(void)
 
 void handle_comment()
 {
-    // clean output line
-    printf("\r");
-    printf("                 ");
-    printf("\r");
-
     stateNo = 0;
     do
-        fscanf(yyin, "%c", yytext);
-    while (yytext[0] != '\n');
+        fscanf(yyin, "%c", &yytext[yytextIdx]);
+    while (yytext[yytextIdx] != '\n');
     yylineNo++;
+
+    // clear yytext
+    memset(yytext, '\0', YYTEXT_MAX_SIZE); // empty the string
+    yytextIdx = -1;                        // to account for ++ at the end of while loop of yylex
 }
 
 int other()
@@ -131,9 +131,13 @@ int other()
     // need to get prev char from file
 
     // so we go back two places
-    fseek(yyin, -2, SEEK_CUR);
-    // then read one character again (no we are back one place)
-    fscanf(yyin, "%c", yytext);
+    fseek(yyin, -1, SEEK_CUR);
+    // // then read one character again (no we are back one place)
+    // fscanf(yyin, "%c", yytext);
+
+    // remove current character from yytext (cause we goin back)
+    yytext[yytextIdx] = '\0';
+    yytextIdx--;
 
     int prevState = stateNo;
     stateNo = 0;
@@ -203,89 +207,93 @@ int yylex()
     {
         do
         {
-            fscanf(yyin, "%c", yytext);
+            fscanf(yyin, "%c", &yytext[yytextIdx]);
 
-            if (yytext[0] == '\n')
+            if (yytext[yytextIdx] == '\n')
                 yylineNo++;
 
-        } while (yytext[0] == '\t' || yytext[0] == '\n');
+        } while (
+            yytext[yytextIdx] == '\t' ||
+            yytext[yytextIdx] == '\n');
 
-        if (strlen(yytext) > 0 && yytext[0] != ' ')
-            printf("%s", yytext);
+        if(strcmp(yytext, "\0") == 0){
+            printf("end\n");
+            exit(0);
+        }
 
         if (stateNo == 0) // start
         {
-            if (yytext[0] == '+')
+            if (yytext[yytextIdx] == '+')
                 stateNo = 1;
-            else if (yytext[0] == '-')
+            else if (yytext[yytextIdx] == '-')
                 stateNo = 4;
-            else if (yytext[0] == '*')
+            else if (yytext[yytextIdx] == '*')
                 stateNo = 7;
-            else if (yytext[0] == '/')
+            else if (yytext[yytextIdx] == '/')
                 stateNo = 9;
-            else if (yytext[0] == '%')
+            else if (yytext[yytextIdx] == '%')
                 stateNo = 12;
-            else if (yytext[0] == '=')
+            else if (yytext[yytextIdx] == '=')
                 stateNo = 14;
-            else if (yytext[0] == '>')
+            else if (yytext[yytextIdx] == '>')
                 stateNo = 16;
-            else if (yytext[0] == '<')
+            else if (yytext[yytextIdx] == '<')
                 stateNo = 19;
-            else if (yytext[0] == '!')
+            else if (yytext[yytextIdx] == '!')
                 stateNo = 22;
-            else if (yytext[0] == '&')
+            else if (yytext[yytextIdx] == '&')
                 stateNo = 24;
-            else if (yytext[0] == '|')
+            else if (yytext[yytextIdx] == '|')
                 stateNo = 26;
-            else if (yytext[0] == '^')
+            else if (yytext[yytextIdx] == '^')
                 stateNo = 28;
-            else if (yytext[0] == 'i')
+            else if (yytext[yytextIdx] == 'i')
                 stateNo = 30;
-            else if (yytext[0] == 'f')
+            else if (yytext[yytextIdx] == 'f')
                 stateNo = 39;
-            else if (yytext[0] == 'c')
+            else if (yytext[yytextIdx] == 'c')
                 stateNo = 44;
-            else if (yytext[0] == 'w')
+            else if (yytext[yytextIdx] == 'w')
                 stateNo = 50;
-            else if (yytext[0] == 'e')
+            else if (yytext[yytextIdx] == 'e')
                 stateNo = 55;
-            else if (yytext[0] == 'l')
+            else if (yytext[yytextIdx] == 'l')
                 stateNo = 59;
-            else if (yytext[0] == 'v')
+            else if (yytext[yytextIdx] == 'v')
                 stateNo = 63;
-            else if (yytext[0] == 'r')
+            else if (yytext[yytextIdx] == 'r')
                 stateNo = 67;
-            else if (isalpha(yytext[0]) || yytext[0] == '_')
+            else if (isalpha(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
-            else if (isdigit(yytext[0]))
+            else if (isdigit(yytext[yytextIdx]))
                 stateNo = 74;
-            else if (yytext[0] == '#')
+            else if (yytext[yytextIdx] == '#')
                 handle_comment(); // preprocessor ignored by yylex
-            else if (yytext[0] == '"')
+            else if (yytext[yytextIdx] == '"')
                 stateNo = 80;
-            else if (yytext[0] == '{')
+            else if (yytext[yytextIdx] == '{')
                 return CURLY_BRACKET_START_TOK;
-            else if (yytext[0] == '}')
+            else if (yytext[yytextIdx] == '}')
                 return CURLY_BRACKET_END_TOK;
-            else if (yytext[0] == '(')
+            else if (yytext[yytextIdx] == '(')
                 return LPAREN_TOK;
-            else if (yytext[0] == ')')
+            else if (yytext[yytextIdx] == ')')
                 return RPAREN_TOK;
-            else if (yytext[0] == '[')
+            else if (yytext[yytextIdx] == '[')
                 return SQUARE_BRACKET_START_TOK;
-            else if (yytext[0] == ']')
+            else if (yytext[yytextIdx] == ']')
                 return SQUARE_BRACKET_END_TOK;
-            else if (yytext[0] == '.')
+            else if (yytext[yytextIdx] == '.')
                 return DEREFERENCE_TOK;
-            else if (yytext[0] == ';')
+            else if (yytext[yytextIdx] == ';')
                 return SEMICOLON_TOK;
-            else if (yytext[0] == '\\')
+            else if (yytext[yytextIdx] == '\\')
                 return BACKSLASH_TOK;
-            else if (yytext[0] == ',')
+            else if (yytext[yytextIdx] == ',')
                 return COMMA_TOK;
-            else if (yytext[0] == '~')
+            else if (yytext[yytextIdx] == '~')
                 return COMPLEMENT_TOK;
-            else if (yytext[0] == ' ')
+            else if (yytext[yytextIdx] == ' ')
                 ; // ignore
             else
             {
@@ -295,41 +303,41 @@ int yylex()
         }
         else if (stateNo == 1) // +
         {
-            if (yytext[0] == '=') //+=
+            if (yytext[yytextIdx] == '=') //+=
             {
                 stateNo = 0;
                 return PLUS_EQUAL_TOK;
             }
-            else if (yytext[0] == '+') //++
+            else if (yytext[yytextIdx] == '+') //++
             {
                 stateNo = 0;
                 return PLUS_PLUS_TOK;
             }
-            else if (isdigit(yytext[0]))
+            else if (isdigit(yytext[yytextIdx]))
                 stateNo = 74;
             else
                 return other();
         }
         else if (stateNo == 4) // -
         {
-            if (yytext[0] == '-') // --
+            if (yytext[yytextIdx] == '-') // --
             {
                 stateNo = 0;
                 return MINUS_MINUS_TOK;
             }
-            else if (yytext[0] == '=') //-=
+            else if (yytext[yytextIdx] == '=') //-=
             {
                 stateNo = 0;
                 return MINUS_EQUAL_TOK;
             }
-            else if (isdigit(yytext[0]))
+            else if (isdigit(yytext[yytextIdx]))
                 stateNo = 74;
             else
                 return other();
         }
         else if (stateNo == 7) //*
         {
-            if (yytext[0] == '=') //*=
+            if (yytext[yytextIdx] == '=') //*=
             {
                 stateNo = 0;
                 return STAR_EQUAL_TOK;
@@ -339,21 +347,19 @@ int yylex()
         }
         else if (stateNo == 9) // /
         {
-            if (yytext[0] == '=') // /=
+            if (yytext[yytextIdx] == '=') // /=
             {
                 stateNo = 0;
                 return SLASH_EQUAL_TOK;
             }
-            else if (yytext[0] == '/') // //
-            {
+            else if (yytext[yytextIdx] == '/') // //
                 handle_comment();
-            }
             else
                 return other();
         }
         else if (stateNo == 12) // %
         {
-            if (yytext[0] == '=') // %=
+            if (yytext[yytextIdx] == '=') // %=
             {
                 stateNo = 0;
                 return MOD_EQUAL_TOK;
@@ -363,7 +369,7 @@ int yylex()
         }
         else if (stateNo == 14) // =
         {
-            if (yytext[0] == '=') // ==
+            if (yytext[yytextIdx] == '=') // ==
             {
                 stateNo = 0;
                 return EQUAL_EQUAL_TOK;
@@ -373,12 +379,12 @@ int yylex()
         }
         else if (stateNo == 16) // >
         {
-            if (yytext[0] == '>') // >>
+            if (yytext[yytextIdx] == '>') // >>
             {
                 stateNo = 0;
                 return RIGHT_SHIFT_TOK;
             }
-            else if (yytext[0] == '=') // >=
+            else if (yytext[yytextIdx] == '=') // >=
             {
                 stateNo = 0;
                 return GREATER_EQUAL_TOK;
@@ -388,12 +394,12 @@ int yylex()
         }
         else if (stateNo == 19) // <
         {
-            if (yytext[0] == '<') // <<
+            if (yytext[yytextIdx] == '<') // <<
             {
                 stateNo = 0;
                 return LEFT_SHIFT_TOK;
             }
-            else if (yytext[0] == '=') // <=
+            else if (yytext[yytextIdx] == '=') // <=
             {
                 stateNo = 0;
                 return LESS_EQUAL_TOK;
@@ -403,7 +409,7 @@ int yylex()
         }
         else if (stateNo == 22) // !
         {
-            if (yytext[0] == '=') // !=
+            if (yytext[yytextIdx] == '=') // !=
             {
                 stateNo = 0;
                 return NOT_EQUAL_TOK;
@@ -413,7 +419,7 @@ int yylex()
         }
         else if (stateNo == 24) // &
         {
-            if (yytext[0] == '&') // &&
+            if (yytext[yytextIdx] == '&') // &&
             {
                 stateNo = 0;
                 return AND_AND_TOK;
@@ -423,7 +429,7 @@ int yylex()
         }
         else if (stateNo == 26) // |
         {
-            if (yytext[0] == '|') // ||
+            if (yytext[yytextIdx] == '|') // ||
             {
                 stateNo = 0;
                 return OR_OR_TOK;
@@ -433,7 +439,7 @@ int yylex()
         }
         else if (stateNo == 28) // ^
         {
-            if (yytext[0] == '=') // ^=
+            if (yytext[yytextIdx] == '=') // ^=
             {
                 stateNo = 0;
                 return XOR_EQUAL_TOK;
@@ -443,88 +449,88 @@ int yylex()
         }
         else if (stateNo == 30) // i
         {
-            if (yytext[0] == 'n')
+            if (yytext[yytextIdx] == 'n')
                 stateNo = 31;
-            else if (yytext[0] == 'f')
+            else if (yytext[yytextIdx] == 'f')
                 stateNo = 38;
-            else if (isalnum(yytext[0]) || yytext[0] == '_' || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_' || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 38) // if
         {
-            if (isalnum(yytext[0]) || yytext[0] == '_' || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_' || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 31) // in
         {
-            if (yytext[0] == 't')
+            if (yytext[yytextIdx] == 't')
                 stateNo = 32;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 32) // int
         {
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 39) // f
         {
-            if (yytext[0] == 'l')
+            if (yytext[yytextIdx] == 'l')
                 stateNo = 40;
-            else if (yytext[0] == 'o')
+            else if (yytext[yytextIdx] == 'o')
                 stateNo = 48;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 40) // fl
         {
-            if (yytext[0] == 'o')
+            if (yytext[yytextIdx] == 'o')
                 stateNo = 41;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 41) // flo
         {
-            if (yytext[0] == 'a')
+            if (yytext[yytextIdx] == 'a')
                 stateNo = 42;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 42) // floa
         {
-            if (yytext[0] == 't')
+            if (yytext[yytextIdx] == 't')
                 stateNo = 43;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 43) // float
         {
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 48) // fo
         {
-            if (yytext[0] == 'r')
+            if (yytext[yytextIdx] == 'r')
                 stateNo = 49;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
@@ -532,34 +538,34 @@ int yylex()
         else if (stateNo == 49) // for
         {
 
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 44) // c
         {
-            if (yytext[0] == 'h')
+            if (yytext[yytextIdx] == 'h')
                 stateNo = 45;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 45) // ch
         {
-            if (yytext[0] == 'a')
+            if (yytext[yytextIdx] == 'a')
                 stateNo = 46;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 46) // cha
         {
-            if (yytext[0] == 'r')
+            if (yytext[yytextIdx] == 'r')
                 stateNo = 47;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
@@ -567,43 +573,43 @@ int yylex()
         else if (stateNo == 47) // char
         {
 
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 50) // w
         {
-            if (yytext[0] == 'h')
+            if (yytext[yytextIdx] == 'h')
                 stateNo = 51;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 51) // wh
         {
-            if (yytext[0] == 'i')
+            if (yytext[yytextIdx] == 'i')
                 stateNo = 52;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 52) // whi
         {
-            if (yytext[0] == 'l')
+            if (yytext[yytextIdx] == 'l')
                 stateNo = 53;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 53) // whil
         {
-            if (yytext[0] == 'e')
+            if (yytext[yytextIdx] == 'e')
                 stateNo = 54;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
@@ -611,102 +617,102 @@ int yylex()
         else if (stateNo == 54) // while
         {
 
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 55) // e
         {
-            if (yytext[0] == 'l')
+            if (yytext[yytextIdx] == 'l')
                 stateNo = 56;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 56) // el
         {
-            if (yytext[0] == 's')
+            if (yytext[yytextIdx] == 's')
                 stateNo = 57;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 57) // els
         {
-            if (yytext[0] == 'e')
+            if (yytext[yytextIdx] == 'e')
                 stateNo = 58;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 58) // else
         {
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 59) // l
         {
-            if (yytext[0] == 'o')
+            if (yytext[yytextIdx] == 'o')
                 stateNo = 60;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 60) // lo
         {
-            if (yytext[0] == 'n')
+            if (yytext[yytextIdx] == 'n')
                 stateNo = 61;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 61) // lon
         {
-            if (yytext[0] == 'g')
+            if (yytext[yytextIdx] == 'g')
                 stateNo = 62;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 62) // long
         {
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 63) // v
         {
-            if (yytext[0] == 'o')
+            if (yytext[yytextIdx] == 'o')
                 stateNo = 64;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 64) // vo
         {
-            if (yytext[0] == 'i')
+            if (yytext[yytextIdx] == 'i')
                 stateNo = 65;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 65) // voi
         {
-            if (yytext[0] == 'd')
+            if (yytext[yytextIdx] == 'd')
                 stateNo = 66;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
@@ -714,52 +720,52 @@ int yylex()
         else if (stateNo == 66) // void
         {
 
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 67) // r
         {
-            if (yytext[0] == 'e')
+            if (yytext[yytextIdx] == 'e')
                 stateNo = 68;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 68) // re
         {
-            if (yytext[0] == 't')
+            if (yytext[yytextIdx] == 't')
                 stateNo = 69;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 69) // ret
         {
-            if (yytext[0] == 'u')
+            if (yytext[yytextIdx] == 'u')
                 stateNo = 70;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 70) // retu
         {
-            if (yytext[0] == 'r')
+            if (yytext[yytextIdx] == 'r')
                 stateNo = 71;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 71) // retur
         {
-            if (yytext[0] == 'n')
+            if (yytext[yytextIdx] == 'n')
                 stateNo = 72;
-            else if (isalnum(yytext[0]) || yytext[0] == '_')
+            else if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
@@ -767,71 +773,71 @@ int yylex()
         else if (stateNo == 72) // return
         {
 
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 73) // one or more characters
         {
-            if (isalnum(yytext[0]) || yytext[0] == '_')
+            if (isalnum(yytext[yytextIdx]) || yytext[yytextIdx] == '_')
                 stateNo = 73;
             else
                 return other();
         }
         else if (stateNo == 74) // (+ or - or empty)x; where x is a digit
         {
-            if (isdigit(yytext[0]))
+            if (isdigit(yytext[yytextIdx]))
                 stateNo = 74;
-            else if (yytext[0] == '.')
+            else if (yytext[yytextIdx] == '.')
                 stateNo = 75;
-            else if (yytext[0] == 'e')
+            else if (yytext[yytextIdx] == 'e')
                 stateNo = 77;
             else
                 return other();
         }
         else if (stateNo == 75) // (+ or - or empty)(multiple digits).
         {
-            if (isdigit(yytext[0]))
+            if (isdigit(yytext[yytextIdx]))
                 stateNo = 76;
             else
                 return other();
         }
         else if (stateNo == 76) // (+ or - or empty)(digits).digit
         {
-            if (isdigit(yytext[0]))
+            if (isdigit(yytext[yytextIdx]))
                 stateNo = 76;
-            else if (yytext[0] == 'e')
+            else if (yytext[yytextIdx] == 'e')
                 stateNo = 77;
             else
                 return other();
         }
         else if (stateNo == 77) // (+ or - or empty)(digits).(digits)e OR (+ or - or empty)(digits)e
         {
-            if (isdigit(yytext[0]))
+            if (isdigit(yytext[yytextIdx]))
                 stateNo = 79;
-            else if (yytext[0] == '+' || yytext[0] == '-')
+            else if (yytext[yytextIdx] == '+' || yytext[yytextIdx] == '-')
                 stateNo = 78;
             else
                 return other();
         }
         else if (stateNo == 78) // (+ or - or empty)(digits).(digits)e(- or +) OR (+ or - or empty)(digits)e(- or +)
         {
-            if (isdigit(yytext[0]))
+            if (isdigit(yytext[yytextIdx]))
                 stateNo = 79;
             else
                 return other();
         }
         else if (stateNo == 79) // (+ or - or empty)(digits).(digits)e(- or + or empty) OR (+ or - or empty)(digits)e(- or + or empty)
         {
-            if (isdigit(yytext[0]))
+            if (isdigit(yytext[yytextIdx]))
                 stateNo = 79;
             else
                 return other();
         }
         else if (stateNo == 80) // "(zero or more characters)
         {
-            if (yytext[0] == '"')
+            if (yytext[yytextIdx] == '"')
                 stateNo = 81;
             else
                 stateNo = 80;
@@ -845,6 +851,9 @@ int yylex()
             printf("Error on Line %d\n", yylineNo);
             exit(1);
         }
+
+        if (yytext[yytextIdx] != ' ')
+            yytextIdx++;
     }
     printf("Error on Line %d\n", yylineNo);
     exit(1);
@@ -854,6 +863,7 @@ int yylex()
 void main(int argc, char *argv[])
 {
     yylineNo = 1;
+    yytextIdx = 0;
     int token;
     if (argc != 2)
     {
@@ -869,7 +879,9 @@ void main(int argc, char *argv[])
     while (!feof(yyin))
     {
         token = yylex();
-        printf("\t%d\n", token);
+        printf("%s\t%d\n", yytext, token);
+        memset(yytext, '\0', YYTEXT_MAX_SIZE); // empty the string
+        yytextIdx = 0;
     }
     yywrap();
 }
