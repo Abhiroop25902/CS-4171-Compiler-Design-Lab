@@ -1,0 +1,56 @@
+/* Single caharacter lexemes */
+#define SEMICOLON_TOK ';'
+#define COMMA_TOK ','
+#define LCRLY_TOK '{'
+#define RCRLY_TOK '}'
+#define LPAREN_TOK '('
+#define RPAREN_TOK ')'
+#define EQUAL_TOK '='
+#define DIVIDE_TOK '/'
+#define STAR_TOK '*'
+#define MOD_TOK '%'
+#define PLUS_TOK '+'
+#define MINUS_TOK '-'
+#define NOT_TOK '!'
+#define AND_TOK '&'
+#define OR_TOK '|'
+#define XOR_TOK '^'
+#define COMPLEMENT_TOK '~'
+#define SQUARE_BRACKET_START_TOK '['
+#define SQUARE_BRACKET_END_TOK ']'
+/* Reserved words */
+#define INT_TOK 256
+#define MAIN_TOK 257
+#define VOID_TOK 258
+#define FOR_TOK 259
+#define CHAR_TOK 260
+#define LESS_EQUAL_TOK 261
+#define PLUS_PLUS_TOK 262
+#define FLOAT_TOK 263
+#define MINUS_EQUAL_TOK 264
+#define SLASH_EQUAL_TOK 265
+#define STAR_EQUAL_TOK 266
+#define IF_TOK 267
+#define NOT_EQUAL_TOK 268
+#define AND_AND_TOK 269
+#define EQUAL_EQUAL_TOK 270
+#define OR_OR_TOK 271
+#define ELSE_TOK 272
+#define LONG_TOK 273
+#define MINUS_MINUS_TOK 274
+#define MOD_EQUAL_TOK 275
+#define RIGHT_SHIFT_TOK 276
+#define LEFT_SHIFT_TOK 277
+#define PLUS_EQUAL_TOK 278
+#define XOR_EQUAL_TOK 279
+#define WHILE_TOK 280
+#define GREATER_EQUAL_TOK 281
+#define RETURN_TOK 282
+/* Identifier, constants..*/
+#define ID_TOK 352
+#define INT_CONST 353
+#define STRING_CONST 354
+#define FLOAT_CONST 355
+#define EXP_CONST 356
+
+
