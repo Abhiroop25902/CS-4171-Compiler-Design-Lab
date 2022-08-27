@@ -51,9 +51,9 @@ else                                        {return ELSE_TOK;}
 long                                        {return LONG_TOK;}
 return                                      {return RETURN_TOK;}
 ([a-z]|[A-Z]|\_)([a-z]|[A-Z]|[0-9]|\_)*     {return ID_TOK;}
-[0-9]*                                      {return INT_CONST;}
-(\+|\-)?[0-9]*\.[0-9]*                      {return FLOAT_CONST;} 
-[\+|\-]?[0-9]*[\.[0-9]*]?[\e][\+|\-]?[0-9]* {return EXP_CONST;} 
+[0-9]+                                      {return INT_CONST;}
+(\+|\-)?[0-9]+\.[0-9]+                      {return FLOAT_CONST;} 
+(\+|\-)?[0-9]+(\.[0-9]+)?\e(\+|\-)?[0-9]+   {return EXP_CONST;} 
 \".*\"                                      {return STRING_CONST;}
 \n                                          {}
 \t                                          {}
