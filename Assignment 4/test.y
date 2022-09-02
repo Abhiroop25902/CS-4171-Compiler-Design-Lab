@@ -33,6 +33,10 @@ int scope=0;
 %token WHILE_TOK
 %token STRING_CONST
 %token RETURN_TOK
+%token ADD_TOK
+%token SUB_TOK
+%token MUL_TOK
+%token DIV_TOK
 
 
 
@@ -134,8 +138,21 @@ datatype        :       INT_TOK
 id_token        :       id_token COMMA_TOK ID_TOK          {}
                 |       ID_TOK                             {}
                 |       ID_TOK EQUAL_TOK const
+                |       ID_TOK EQUAL_TOK expression
                 |       ID_TOK INCREMENT_TOK
                 |       INCREMENT_TOK ID_TOK
+                ;
+
+// TODO: 4 shift reduce error, 3 reduce/reduce error
+expression      :       expression expression_op expression
+                |       LPAREN_TOK expression RPAREN_TOK
+                |       const
+                ;
+
+expression_op   :       ADD_TOK
+                |       SUB_TOK
+                |       MUL_TOK
+                |       DIV_TOK
                 ;
 
 const           :       INT_CONST

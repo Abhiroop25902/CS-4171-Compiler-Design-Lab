@@ -14,6 +14,10 @@
 \>				                        {return(GT_TOK);}
 \=                                      {return EQUAL_TOK;}
 \!                                      {return NOT_TOK;}
+\+                                      {return ADD_TOK;}
+\-                                      {return SUB_TOK;}
+\*                                      {return MUL_TOK;}
+\/                                      {return DIV_TOK;}
 \|\|                                    {return COND_OR_TOK;}
 \&\&                                    {return COND_AND_TOK;}
 \=\=                                    {return COND_EQUAL_TOK;}

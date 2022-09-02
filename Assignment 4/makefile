@@ -23,5 +23,5 @@ clean: hello
 	rm lex.yy.c
 	rm y.tab.c
 	rm y.tab.h
-	rm y.output
 	rm ./a.out
+	rm y.output

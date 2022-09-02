@@ -11,7 +11,8 @@ int abs(){
 
 int main()
 {
-    // char d = 'a';
+    // char d = 'a' + 'b';
+    // int c = (1 + 2) - 3 * (2/3);
 
     if(1 > 2 || _test == 3 &&!(__test > +1.123)){
         printf("Hello World");
