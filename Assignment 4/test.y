@@ -43,8 +43,8 @@ int scope=0;
 
 
 %%
-S               :       S FUNC 
-                |       S stmt                         
+S               :       FUNC S
+                |       stmt S                        
                 |       FUNC
                 |       stmt
                 ;
