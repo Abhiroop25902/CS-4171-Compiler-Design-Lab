@@ -47,119 +47,119 @@ int scope=0;
 
 
 %%
-S               :       FUNC S
-                |       stmt S                        
-                |       FUNC
-                |       stmt
-                ;
+S                 :       FUNC S
+                  |       stmt S                        
+                  |       FUNC
+                  |       stmt
+                  ;
 
-FUNC            :       datatype  MAIN_TOK LPAREN_TOK RPAREN_TOK BLOCK    {printf("Syntax for Main Function is Ok....\n");}
-                |       datatype  ID_TOK LPAREN_TOK RPAREN_TOK BLOCK
-                ;
+FUNC              :       datatype  MAIN_TOK LPAREN_TOK RPAREN_TOK BLOCK    {printf("Syntax for Main Function is Ok....\n");}
+                  |       datatype  ID_TOK LPAREN_TOK RPAREN_TOK BLOCK
+                  ;
 
-BLOCK           :       LCRLY_TOK  STATEMENTS  BLOCKS  RCRLY_TOK
-                ;       
+BLOCK             :       LCRLY_TOK  STATEMENTS  BLOCKS  RCRLY_TOK
+                  ;       
 
-BLOCKS          :       BLOCK STATEMENTS BLOCKS                                {}
-                |
-                ;
+BLOCKS            :       BLOCK STATEMENTS BLOCKS                                {}
+                  |
+                  ;
 
-STATEMENTS      :       STATEMENTS stmt
-                |       STATEMENTS conditional
-                |       STATEMENTS iterative
-                |       STATEMENTS func_call
-                |       
-                ; 
+STATEMENTS        :       STATEMENTS stmt
+                  |       STATEMENTS conditional
+                  |       STATEMENTS iterative
+                  |       STATEMENTS func_call
+                  |       
+                  ; 
 
 // TODO: 2 shift error from here
-func_call       :       ID_TOK LPAREN_TOK PARAMETERS RPAREN_TOK func_end
-                ;
+func_call         :       ID_TOK LPAREN_TOK PARAMETERS RPAREN_TOK func_end
+                  ;
 
-func_end        :       SEMICOLON_TOK
-                |       
-                ;
+func_end          :       SEMICOLON_TOK
+                  |       
+                  ;
 
-PARAMETERS      :       PARAMETER PARAMETERS
-                |       COMMA_TOK PARAMETERS
-                |
-                ;
+PARAMETERS        :       PARAMETER PARAMETERS
+                  |       COMMA_TOK PARAMETERS
+                  |
+                  ;
 
-PARAMETER       :       ID_TOK
-                |       const
-                |       func_call
-                ;
+PARAMETER         :       ID_TOK
+                  |       const
+                  |       func_call
+                  ;
 
-iterative       :       FOR_TOK LPAREN_TOK DECLARATION SEMICOLON_TOK comparision SEMICOLON_TOK DECLARATION RPAREN_TOK BLOCK
-                |       WHILE_TOK LPAREN_TOK comparision RPAREN_TOK BLOCK
-                ;
+iterative         :       FOR_TOK LPAREN_TOK DECLARATION SEMICOLON_TOK comparision SEMICOLON_TOK DECLARATION RPAREN_TOK BLOCK
+                  |       WHILE_TOK LPAREN_TOK comparision RPAREN_TOK BLOCK
+                  ;
 
-conditional     :       IF_TOK LPAREN_TOK cond_expression RPAREN_TOK BLOCK
-                |       IF_TOK LPAREN_TOK cond_expression RPAREN_TOK BLOCK ELSE_TOK BLOCK
-                ;
+conditional       :       IF_TOK LPAREN_TOK cond_expression RPAREN_TOK BLOCK
+                  |       IF_TOK LPAREN_TOK cond_expression RPAREN_TOK BLOCK ELSE_TOK BLOCK
+                  ;
 
 // TODO: This is givong 4 warnings
-cond_expression :       cond_expression COND_OR_TOK cond_expression
-                |       cond_expression COND_AND_TOK cond_expression
-                |       LPAREN_TOK cond_expression RPAREN_TOK 
-                |       NOT_TOK LPAREN_TOK cond_expression RPAREN_TOK 
-                |       comparision
+cond_expression   :       cond_expression COND_OR_TOK cond_expression
+                  |       cond_expression COND_AND_TOK cond_expression
+                  |       LPAREN_TOK cond_expression RPAREN_TOK 
+                  |       NOT_TOK LPAREN_TOK cond_expression RPAREN_TOK 
+                  |       comparision
 
-comparision     :       data LT_TOK data 
-                |       data GT_TOK data
-                |       data COND_EQUAL_TOK data
-                |       const
-                ;
+comparision       :       data LT_TOK data 
+                  |       data GT_TOK data
+                  |       data COND_EQUAL_TOK data
+                  |       const
+                  ;
 
-data            :       INT_CONST
-                |       FLOAT_CONST
-                |       ID_TOK
-                ;
+data              :       INT_CONST
+                  |       FLOAT_CONST
+                  |       ID_TOK
+                  ;
      
 
-stmt            :       DECLARATION SEMICOLON_TOK       {}
-                ;
+stmt              :       DECLARATION SEMICOLON_TOK       {}
+                  ;
 
 
-DECLARATION     :       datatype id_token       {printf("Syntax of The Declaration Statement is Correct.....\n");}
-                |       RETURN_TOK ret_data
-                ;
+DECLARATION       :       datatype id_token       {printf("Syntax of The Declaration Statement is Correct.....\n");}
+                  |       RETURN_TOK ret_data
+                  ;
 
 // TODO: one shift reduce warning
-ret_data        :       PARAMETER
-                |       
-                ;
+ret_data          :       PARAMETER
+                  |       
+                  ;
 
-datatype        :       INT_TOK
-                |       FLOAT_TOK
-                |       CHAR_TOK
-                |
-                ;
+datatype          :       INT_TOK
+                  |       FLOAT_TOK
+                  |       CHAR_TOK
+                  |
+                  ;
 
-id_token        :       id_token COMMA_TOK ID_TOK          {}
-                |       ID_TOK                             {}
-                |       ID_TOK EQUAL_TOK const
-                |       ID_TOK EQUAL_TOK expression
-                |       ID_TOK INCREMENT_TOK
-                |       INCREMENT_TOK ID_TOK
-                ;
+id_token          :       id_token COMMA_TOK ID_TOK          {}
+                  |       ID_TOK                             {}
+                  |       ID_TOK EQUAL_TOK const
+                  |       ID_TOK EQUAL_TOK expression
+                  |       ID_TOK INCREMENT_TOK
+                  |       INCREMENT_TOK ID_TOK
+                  ;
 
 // TODO: 4 shift reduce error, 3 reduce/reduce error
-expression      :       expression expression_op expression
-                |       LPAREN_TOK expression RPAREN_TOK
-                |       const
-                ;
+expression        :       expression expression_op expression
+                  |       LPAREN_TOK expression RPAREN_TOK
+                  |       const
+                  ;
 
-expression_op   :       ADD_TOK
-                |       SUB_TOK
-                |       MUL_TOK
-                |       DIV_TOK
-                ;
+expression_op     :       ADD_TOK
+                  |       SUB_TOK
+                  |       MUL_TOK
+                  |       DIV_TOK
+                  ;
 
-const           :       INT_CONST
-                |       FLOAT_CONST
-                |       CHAR_CONST
-                |       STRING_CONST
-                ;
+const             :       INT_CONST
+                  |       FLOAT_CONST
+                  |       CHAR_CONST
+                  |       STRING_CONST
+                  ;
 
 
 
