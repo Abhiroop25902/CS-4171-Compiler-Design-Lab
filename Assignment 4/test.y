@@ -53,11 +53,12 @@ S                 :  FUNC S
                   |  stmt
                   ;
 
-FUNC              :  datatype  MAIN_TOK LPAREN_TOK RPAREN_TOK BLOCK    
-                  |  datatype  ID_TOK LPAREN_TOK RPAREN_TOK BLOCK
+FUNC              :  datatype  MAIN_TOK LPAREN_TOK PARAMETERS RPAREN_TOK BLOCK    
+                  |  datatype  ID_TOK LPAREN_TOK PARAMETERS RPAREN_TOK BLOCK
                   ;
 
 BLOCK             :  LCRLY_TOK  STATEMENTS  BLOCKS  RCRLY_TOK
+                  |  SEMICOLON_TOK
                   ;       
 
 BLOCKS            :  BLOCK STATEMENTS BLOCKS                                
@@ -77,6 +78,7 @@ func_call         :  ID_TOK LPAREN_TOK PARAMETERS RPAREN_TOK SEMICOLON_TOK
 
 PARAMETERS        :  PARAMETER PARAMETERS
                   |  COMMA_TOK PARAMETERS
+                  |  DECLARATION  
                   |
                   ;
 
@@ -91,6 +93,7 @@ iterative         :  FOR_TOK LPAREN_TOK DECLARATION SEMICOLON_TOK comparision SE
 
 conditional       :  IF_TOK LPAREN_TOK cond_expression RPAREN_TOK BLOCK
                   |  IF_TOK LPAREN_TOK cond_expression RPAREN_TOK BLOCK ELSE_TOK BLOCK
+                  |  IF_TOK LPAREN_TOK cond_expression RPAREN_TOK BLOCK ELSE_TOK conditional
                   ;
 
 cond_expression   :  cond_expression cond_op cond_expression
