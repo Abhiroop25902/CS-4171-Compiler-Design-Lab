@@ -33,7 +33,7 @@ void hash_table_insert(hash_table *h, int scope, char *var_type, char *var_name)
     if (prev_var == NULL || prev_var->scope != scope)
         h->tab[ll_num] = ll_insert_start(h->tab[ll_num], scope, var_type, var_name);
     else if (prev_var->scope == scope){
-        printf("Error: Variable %s already defined of type %s\n", prev_var->var_name, prev_var->var_type);
+        printf("Error in line %d: Variable %s already defined of type %s\n", yylineno, prev_var->var_name, prev_var->var_type);
         exit(1);
     }
 }

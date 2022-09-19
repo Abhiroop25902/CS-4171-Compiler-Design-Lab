@@ -39,6 +39,7 @@ return                                  {return RETURN_TOK;}
 (\+|\-)?[0-9]+\.[0-9]+                  {return FLOAT_CONST;} 
 \'.\'                                   {return CHAR_CONST;} 
 \".*\"                                  {return STRING_CONST;}
+\n                                      {yylineno++;}
 %%
 
 /*
