@@ -2,7 +2,7 @@
 
 int _test;
 _test = 1.24;
-float _test;
+// float _test;
 float __test = -10.123;
 
 int abs(int a);

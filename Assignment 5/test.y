@@ -117,7 +117,7 @@ comparision       :  data LT_TOK data
 
 data              :  INT_CONST
                   |  FLOAT_CONST
-                  |  ID_TOK
+                  |  ID_TOK              {if(!hash_table_isPresent(h, var_name)){printf("Error: unknown name '%s' found\n", var_name); exit(1);}}
                   ;
      
 
