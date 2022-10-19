@@ -6,6 +6,7 @@ void yyerror(char *);
 int scope=0;
 char data_type[10];
 hash_table* h = NULL;
+hash_table* gram_type = NULL;
 %}
 
 %token SEMICOLON_TOK
@@ -134,12 +135,17 @@ ret_data          :  PARAMETER
                   |       
                   ;
 
-datatype          :  INT_TOK        {strcpy(data_type, yytext);}
-                  |  FLOAT_TOK      {strcpy(data_type, yytext);}
-                  |  CHAR_TOK       {strcpy(data_type, yytext);}  
+datatype          :  INT_TOK             {strcpy(data_type, yytext);}
+                  |  FLOAT_TOK           {strcpy(data_type, yytext);}
+                  |  CHAR_TOK            {strcpy(data_type, yytext);}  
+                  |  datatype STARS
                   ;
 
-id_token          :  id_token COMMA_TOK id_token   // TODO: comma parameters
+STARS             :  STARS MUL_TOK       {strcat(data_type, "*");}
+                  |  
+                  ;
+
+id_token          :  id_token COMMA_TOK id_token
                   |  ID_TOK                       
                   |  ID_TOK EQUAL_TOK expression 
                   |  ID_TOK INCREMENT_TOK
@@ -173,7 +179,10 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Error: Need a File Name");
         exit(1);
    }     
+   
    h = create_hash_table();
+   gram_type = create_hash_table();
+
    yyin = fopen(argv[1], "r");
    if (yyin == NULL)
       perror("fopen() error");

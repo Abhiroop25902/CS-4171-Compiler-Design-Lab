@@ -10,6 +10,7 @@ int abs(int a);
 int main()
 {
     char _test = 'a' + 'b';
+    char* text = "abc";
     int c = (1 + 2) - 3 * (2 / 3);
 
     if (1 > 2 || _test == 3 && !(__test > +1.123))
