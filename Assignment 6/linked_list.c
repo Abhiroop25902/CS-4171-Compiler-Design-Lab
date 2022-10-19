@@ -88,18 +88,18 @@ ll_node *isPresent(ll_node *head, char* var_name)
     return NULL;
 }
 
-// void printLL(ll_node *head)
-// {
-//     ll_node *ptr = head;
+void printLL(ll_node *head)
+{
+    ll_node *ptr = head;
 
-//     while (ptr != NULL)
-//     {
-//         printf("%d,%s,%s -> ", ptr->scope, ptr->var_name, ptr->var_type);
-//         ptr = ptr->next;
-//     }
+    while (ptr != NULL)
+    {
+        printf("%d,%s,%s -> ", ptr->scope, ptr->var_name, ptr->var_type);
+        ptr = ptr->next;
+    }
 
-//     printf("NULL\n");
-// }
+    printf("NULL\n");
+}
 
 // void main()
 // {

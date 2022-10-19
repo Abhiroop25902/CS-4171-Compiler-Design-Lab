@@ -50,13 +50,13 @@ bool hash_table_isPresent(hash_table *ht, char* var_name){
     return isPresent(ht->tab[idx], var_name) != NULL;
 }
 
-// void printHash(hash_table *h)
-// {
-//     for (int i = 0; i < HASH_TABLE_SIZE; i++)
-//     {
-//         printLL(h->tab[i]);
-//     }
-// }
+void printHash(hash_table *h)
+{
+    for (int i = 0; i < HASH_TABLE_SIZE; i++)
+    {
+        printLL(h->tab[i]);
+    }
+}
 
 // void main()
 // {
