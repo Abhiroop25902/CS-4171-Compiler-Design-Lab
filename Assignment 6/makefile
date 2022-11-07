@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := run
 
 hello:
-	@echo "Assignment 4 by Abhiroop Mukherjee (510519109)"
+	@echo "Assignment 6 by Abhiroop Mukherjee (510519109)"
 
 generate: hello
 	@echo "Generating Required Files"
