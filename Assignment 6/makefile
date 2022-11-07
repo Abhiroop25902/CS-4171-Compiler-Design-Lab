@@ -5,9 +5,9 @@ hello:
 
 generate: hello
 	@echo "Generating Required Files"
-	yacc test.y -d
 	lex test.l
-	gcc y.tab.c -ll
+	yacc test.y -d
+	gcc y.tab.c lex.yy.c symTable.c syntaxTree.c -ll
 	@echo "Now do 'make run' to run"
 
 info:
@@ -16,7 +16,7 @@ info:
 
 run: generate
 	@echo "Running program"
-	./a.out code.c
+	./a.out < file.c
 
 clean: hello
 	@echo "Cleaning up..."
